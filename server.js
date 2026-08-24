@@ -5,6 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const app = express();
+app.set('trust proxy', true); // Trust Railway's reverse proxy — fixes req.protocol returning http instead of https
 const PORT = process.env.PORT || 3000;
 const AUTH_CODE = process.env.AUTH_CODE || '12345';
 
