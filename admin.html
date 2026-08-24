@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bopz-pics Image Manager</title>
+    <title>Media Manager</title>
     <style>
         * {
             margin: 0;
@@ -13,40 +13,44 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #0f0f0f;
             min-height: 100vh;
-            padding: 20px;
-            color: #fff;
+            padding: 16px;
+            color: #e4e4e7;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1024px;
             margin: 0 auto;
-            background: rgba(30, 30, 50, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            border: 2px solid #ff1493;
         }
 
         h1 {
-            margin-bottom: 30px;
-            color: #ff1493;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #fafafa;
             text-align: center;
         }
 
         .upload-section {
-            background: rgba(255, 20, 147, 0.1);
-            border: 2px dashed #ff1493;
+            background: #1a1a1a;
+            border: 1px dashed #333;
             border-radius: 12px;
-            padding: 30px;
+            padding: 48px 24px;
             text-align: center;
-            margin-bottom: 30px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: border-color 0.2s, background 0.2s;
         }
 
         .upload-section:hover {
-            background: rgba(255, 20, 147, 0.2);
+            border-color: #555;
+            background: #1f1f1f;
+        }
+
+        .upload-section p {
+            color: #71717a;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
         }
 
         .upload-section input {
@@ -54,135 +58,184 @@
         }
 
         .upload-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
-            color: white;
+            padding: 10px 20px;
+            background: #fafafa;
+            color: #0f0f0f;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.2s;
         }
 
         .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 20, 147, 0.4);
+            background: #d4d4d8;
         }
 
-        .images-section h2 {
-            margin: 30px 0 20px;
-            color: #ff69b4;
+        .media-section h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #a1a1aa;
+        }
+
+        .media-section {
+            margin-top: 16px;
+        }
+
+        .empty-message {
+            color: #52525b;
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #f87171;
+            text-align: center;
         }
 
         .images-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
         }
 
         .image-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #ff1493;
-            border-radius: 12px;
+            background: #1a1a1a;
+            border: 1px solid #27272a;
+            border-radius: 8px;
             overflow: hidden;
-            transition: all 0.3s;
+            transition: border-color 0.2s;
         }
 
         .image-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.3);
+            border-color: #3f3f46;
         }
 
-        .image-card img {
+        .image-card img,
+        .image-card video {
             width: 100%;
-            height: 150px;
+            height: 160px;
             object-fit: cover;
             display: block;
         }
 
         .image-card-footer {
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            text-align: center;
+            padding: 10px;
         }
 
         .delete-btn {
-            background: #ff1493;
-            color: white;
-            border: none;
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
             padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 0.75rem;
             width: 100%;
-            transition: all 0.2s;
+            transition: background 0.2s, color 0.2s;
         }
 
         .delete-btn:hover {
-            background: #ff69b4;
+            background: #ef4444;
+            color: #fff;
         }
 
-        .status {
-            text-align: center;
-            padding: 15px;
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 12px 16px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
+            font-size: 0.875rem;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.2s, transform 0.2s;
         }
 
-        .status.success {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            display: block;
+        .toast.visible {
+            opacity: 1;
+            transform: translateX(0);
         }
 
-        .status.error {
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            display: block;
+        .toast.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #f87171;
         }
 
         .loading {
             text-align: center;
-            color: #ff69b4;
+            color: #71717a;
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
+            body {
+                padding: 16px;
+            }
+
+            .upload-section {
+                padding: 16px;
             }
 
             .images-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎀 bopz-pics Image Manager</h1>
+        <h1>Media Manager</h1>
 
-        <div id="status" class="status"></div>
+        <div id="toastContainer" class="toast-container"></div>
 
         <div class="upload-section" onclick="document.getElementById('fileInput').click()">
-            <input id="fileInput" type="file" accept="image/*" multiple onchange="handleFileSelect(event)">
-            <p>Drag & drop images here or click to upload</p>
-            <button class="upload-btn">Select Images</button>
+            <input id="fileInput" type="file" accept="image/*,video/mp4,video/webm,video/quicktime" multiple onchange="handleFileSelect(event)">
+            <p>Drag & drop images or videos here or click to upload</p>
+            <button class="upload-btn">Select Files</button>
         </div>
 
-        <div class="images-section">
-            <h2>Uploaded Images</h2>
+        <div class="media-section images-section">
+            <h2>Images</h2>
             <div id="imagesList" class="loading">Loading images...</div>
+        </div>
+
+        <div class="media-section videos-section">
+            <h2>Videos</h2>
+            <div id="videosList" class="loading">Loading videos...</div>
         </div>
     </div>
 
     <script>
         function showStatus(message, type) {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('visible'));
+
             setTimeout(() => {
-                statusEl.className = 'status';
+                toast.classList.remove('visible');
+                setTimeout(() => toast.remove(), 200);
             }, 3000);
         }
 
@@ -191,9 +244,9 @@
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('imagesList');
-                    
+
                     if (data.length === 0) {
-                        container.innerHTML = '<p style="color: #aaa; grid-column: 1/-1; text-align: center;">No images uploaded yet</p>';
+                        container.innerHTML = '<p class="empty-message">No images uploaded yet</p>';
                         return;
                     }
 
@@ -201,18 +254,42 @@
                         <div class="image-card">
                             <img src="${img.url}" alt="image">
                             <div class="image-card-footer">
-                                <button class="delete-btn" onclick="deleteImage('${img.filename}')">Delete</button>
+                                <button class="delete-btn" onclick="deleteFile('${img.filename}')">Delete</button>
                             </div>
                         </div>
                     `).join('');
-
-                    // Convert to grid
-                    const imagesList = document.getElementById('imagesList');
-                    imagesList.className = 'images-grid';
+                    container.className = 'images-grid';
                 })
                 .catch(err => {
                     console.error(err);
-                    document.getElementById('imagesList').innerHTML = '<p style="color: #f44336;">Failed to load images</p>';
+                    document.getElementById('imagesList').innerHTML = '<p class="error-message">Failed to load images</p>';
+                });
+        }
+
+        function loadVideos() {
+            fetch('/api/videos')
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById('videosList');
+
+                    if (data.length === 0) {
+                        container.innerHTML = '<p class="empty-message">No videos uploaded yet</p>';
+                        return;
+                    }
+
+                    container.innerHTML = data.map(vid => `
+                        <div class="image-card">
+                            <video src="${vid.url}" muted preload="metadata"></video>
+                            <div class="image-card-footer">
+                                <button class="delete-btn" onclick="deleteFile('${vid.filename}')">Delete</button>
+                            </div>
+                        </div>
+                    `).join('');
+                    container.className = 'images-grid';
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('videosList').innerHTML = '<p class="error-message">Failed to load videos</p>';
                 });
         }
 
@@ -225,61 +302,75 @@
 
             for (let file of files) {
                 const formData = new FormData();
-                formData.append('image', file);
+                formData.append('file', file);
 
                 fetch('/api/upload', {
                     method: 'POST',
                     body: formData
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) return r.json().then(data => { throw new Error(data.error || 'Upload failed'); });
+                    return r.json();
+                })
                 .then(data => {
                     uploaded++;
                     if (uploaded === total) {
-                        showStatus(`✓ Uploaded ${total} image(s)`, 'success');
+                        showStatus(`Uploaded ${total} file(s)`, 'success');
                         loadImages();
+                        loadVideos();
                         document.getElementById('fileInput').value = '';
                     }
                 })
                 .catch(err => {
-                    showStatus(`✗ Failed to upload ${file.name}`, 'error');
+                    showStatus(`Failed to upload ${file.name}: ${err.message}`, 'error');
                 });
             }
         }
 
-        function deleteImage(filename) {
-            if (!confirm('Delete this image?')) return;
+        function deleteFile(filename) {
+            if (!confirm('Delete this file?')) return;
 
             fetch(`/api/delete/${filename}`, {
                 method: 'DELETE'
             })
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) return r.json().then(data => { throw new Error(data.error || 'Delete failed'); });
+                return r.json();
+            })
             .then(() => {
-                showStatus('✓ Image deleted', 'success');
+                showStatus('File deleted', 'success');
                 loadImages();
+                loadVideos();
             })
             .catch(err => {
-                showStatus('✗ Failed to delete image', 'error');
+                showStatus('Failed to delete file', 'error');
             });
         }
 
-        // Load images on page load
-        window.addEventListener('load', loadImages);
+        // Load content on page load
+        window.addEventListener('load', () => {
+            loadImages();
+            loadVideos();
+        });
 
         // Drag & drop
         const uploadSection = document.querySelector('.upload-section');
         uploadSection.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadSection.style.background = 'rgba(255, 20, 147, 0.3)';
+            uploadSection.style.borderColor = '#555';
+            uploadSection.style.background = '#1f1f1f';
         });
 
         uploadSection.addEventListener('dragleave', () => {
-            uploadSection.style.background = 'rgba(255, 20, 147, 0.1)';
+            uploadSection.style.borderColor = '';
+            uploadSection.style.background = '';
         });
 
         uploadSection.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadSection.style.background = 'rgba(255, 20, 147, 0.1)';
-            
+            uploadSection.style.borderColor = '';
+            uploadSection.style.background = '';
+
             const files = e.dataTransfer.files;
             document.getElementById('fileInput').files = files;
             handleFileSelect({ target: { files } });
