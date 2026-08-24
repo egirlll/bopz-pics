@@ -200,8 +200,33 @@ app.delete('/api/delete/:filename', requireAuth, (req, res) => {
 // Serve uploaded images
 app.use('/uploads', express.static(uploadsDir));
 
-// Serve admin panel (requires auth)
-app.get('/', requireAuth, (req, res) => {
+// Serve admin panel (auth via query param or header)
+app.get('/', (req, res) => {
+  const queryAuth = req.query.auth;
+  const headerAuth = (req.headers['authorization'] || '').replace('Bearer ', '');
+  
+  if (queryAuth !== AUTH_CODE && headerAuth !== AUTH_CODE) {
+    return res.status(403).send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Denied</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #e4e4e7; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .message { text-align: center; }
+    h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; }
+    p { color: #71717a; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <div class="message">
+    <h1>Access Denied</h1>
+    <p>Valid authorization is required to view this page.</p>
+  </div>
+</body>
+</html>`);
+  }
   res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
