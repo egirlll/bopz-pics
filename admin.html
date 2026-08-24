@@ -224,6 +224,10 @@
     </div>
 
     <script>
+        // Grab auth code from URL query param
+        const AUTH_TOKEN = new URLSearchParams(window.location.search).get('auth') || '';
+        const authHeaders = { 'Authorization': 'Bearer ' + AUTH_TOKEN };
+
         function showStatus(message, type) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -240,7 +244,7 @@
         }
 
         function loadImages() {
-            fetch('/api/images')
+            fetch('/api/images', { headers: authHeaders })
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('imagesList');
@@ -267,7 +271,7 @@
         }
 
         function loadVideos() {
-            fetch('/api/videos')
+            fetch('/api/videos', { headers: authHeaders })
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('videosList');
@@ -306,6 +310,7 @@
 
                 fetch('/api/upload', {
                     method: 'POST',
+                    headers: authHeaders,
                     body: formData
                 })
                 .then(r => {
@@ -331,7 +336,8 @@
             if (!confirm('Delete this file?')) return;
 
             fetch(`/api/delete/${filename}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: authHeaders
             })
             .then(r => {
                 if (!r.ok) return r.json().then(data => { throw new Error(data.error || 'Delete failed'); });
