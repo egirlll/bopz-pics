@@ -15,11 +15,12 @@ app.use((req, res, next) => {
   if (!origin) return next();
 
   const isThrone = origin === 'https://throne.com' || /^https:\/\/[\w-]+\.throne\.com$/.test(origin);
+  const isVercel = /^https:\/\/[\w-]+\.vercel\.app$/.test(origin);
   const isSameHost = (() => {
     try { return new URL(origin).host === req.headers.host; } catch { return false; }
   })();
 
-  if (isThrone || isSameHost) {
+  if (isThrone || isVercel || isSameHost) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type');
